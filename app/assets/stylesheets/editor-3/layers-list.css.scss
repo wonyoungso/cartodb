@@ -167,6 +167,19 @@
   margin-bottom: 8px;
   background: #FFF;
 }
+.Editor-ListAnalysis-item .CDB-Shape-threePoints {
+  display: none;
+}
+.Editor-ListAnalysis-item:hover .CDB-Shape-threePoints {
+  display: block;
+}
+
+@media only screen and (min-device-width : 768px)  and (max-device-width : 1024px)  { 
+  .Editor-ListAnalysis-item .CDB-Shape-threePoints {
+    display: block;
+  }
+}
+
 
 .Editor-ListAnalysis-itemError {
   display: block;
