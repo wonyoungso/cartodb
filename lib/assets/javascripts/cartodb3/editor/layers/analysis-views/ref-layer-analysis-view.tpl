@@ -15,7 +15,8 @@
 <p class="Editor-ListAnalysis-title CDB-Text CDB-Size-small u-secondaryTextColor u-ellipsis u-flex" title="<%- title %>">
   <%- title %> <span class="u-altTextColor u-lSpace u-ellipsis"><%- layerName %></span>
 </p>
-<button class="CDB-Shape-threePoints is-blue is-small">
+
+<button class="CDB-Shape-threePoints is-blue is-small js-toggle-menu">
   <div class="CDB-Shape-threePointsItem"></div>
   <div class="CDB-Shape-threePointsItem"></div>
   <div class="CDB-Shape-threePointsItem"></div>

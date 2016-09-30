@@ -14,6 +14,9 @@
 </div>
 <p class="Editor-ListAnalysis-title CDB-Text CDB-Size-small u-secondaryTextColor u-ellipsis" title="<%- title %>"><%- title %></p>
 
+<div class="js-context-menu"></div>
+
+
 <% if (hasError) { %>
 <div class="Editor-ListAnalysis-itemError"></div>
 <% } %>
