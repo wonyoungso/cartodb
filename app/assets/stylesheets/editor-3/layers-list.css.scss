@@ -218,7 +218,7 @@
 }
 .Editor-ListAnalysis-inner {
   @include display-flex();
-  width: calc(100% + 8px);
+  width: calc(100% + 12px);
   margin: 0 -4px;
 }
 .Editor-ListAnalysis-inner .Editor-ListAnalysis-item {
