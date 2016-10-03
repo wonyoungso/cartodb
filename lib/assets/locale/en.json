@@ -1275,7 +1275,10 @@
         "expand": "Expand",
         "export": "Export data",
         "hide": "Hide layer",
-        "show": "Show layer"
+        "show": "Show layer",
+        "layer-from-node": "Create layer from node",
+        "edit-analysis": "Edit analysis",
+        "delete-analysis": "Delete…"
       },
       "drag-n-drop-analysis": {
         "upgrade-max-layers-err": "%{a_start}Upgrade your account%{a_end} to add more than %{userMaxLayers} layers to your maps."
