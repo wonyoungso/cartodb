@@ -26,11 +26,5 @@
     </div>
   </div>
 
-  <div class="CDB-Shape Editor-HeaderInfoEditorShape">
-    <button class="CDB-Shape-threePoints is-blue is-small js-toggle-menu">
-      <div class="CDB-Shape-threePointsItem"></div>
-      <div class="CDB-Shape-threePointsItem"></div>
-      <div class="CDB-Shape-threePointsItem"></div>
-    </button>
-  </div>
+  <div class="CDB-Shape Editor-HeaderInfoEditorShape js-context-menu"></div>
 </div>

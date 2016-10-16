@@ -55,13 +55,7 @@
             <% } %>
           </button>
         </li>
-        <li class="Editor-HeaderInfo-actionsItem CDB-Shape">
-          <button class="CDB-Shape-threePoints is-blue is-small js-toggle-menu">
-            <div class="CDB-Shape-threePointsItem"></div>
-            <div class="CDB-Shape-threePointsItem"></div>
-            <div class="CDB-Shape-threePointsItem"></div>
-          </button>
-        </li>
+        <li class="Editor-HeaderInfo-actionsItem CDB-Shape js-context-menu"></li>
       </ul>
     </div>
     <div class="u-flex u-justifySpace">
