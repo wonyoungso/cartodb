@@ -16,8 +16,9 @@
   <%- title %> <span class="u-altTextColor u-lSpace u-ellipsis"><%- layerName %></span>
 </p>
 
-<button class="CDB-Shape-threePoints is-blue is-small js-toggle-menu">
-  <div class="CDB-Shape-threePointsItem"></div>
-  <div class="CDB-Shape-threePointsItem"></div>
-  <div class="CDB-Shape-threePointsItem"></div>
-</button>
+<div class="js-context-menu"></div>
+
+
+<% if (hasError) { %>
+<div class="Editor-ListAnalysis-itemError"></div>
+<% } %>
