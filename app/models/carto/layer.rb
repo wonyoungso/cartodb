@@ -213,7 +213,7 @@ module Carto
       new_username = new_user.username
 
       if options.key?(:user_name)
-        old_username ||= options[:user_name]
+        old_username = options[:user_name] || old_username
         options[:user_name] = new_username
       end
 
@@ -231,7 +231,17 @@ module Carto
       map.force_notify_map_change if map
     end
 
+    def custom?
+      CUSTOM_CATEGORIES.include?(category)
+    end
+
+    def category
+      options && options['category']
+    end
+
     private
+
+    CUSTOM_CATEGORIES = %w{Custom NASA TileJSON Mapbox WMS}.freeze
 
     def tables_from_names(table_names, user)
       ::Table.get_all_user_tables_by_names(table_names, user)
@@ -240,12 +250,8 @@ module Carto
     def affected_table_names(query)
       return [] unless query.present?
 
-      # TODO: This is the same that CartoDB::SqlParser().affected_tables does. Maybe remove that class?
-      query_tables = user.in_database.execute("SELECT CDB_QueryTables(#{user.in_database.quote(query)})").first
-      query_tables['cdb_querytables'].split(',').map { |table_name|
-        t = table_name.gsub!(/[\{\}]/, '')
-        (t.blank? ? nil : t)
-      }.compact.uniq
+      query_tables = user.in_database.execute("SELECT unnest(CDB_QueryTables(#{user.in_database.quote(query)}))")
+      query_tables.column_values(0).uniq
     end
 
     def query
