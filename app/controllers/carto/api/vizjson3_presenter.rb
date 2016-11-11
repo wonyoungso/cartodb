@@ -31,21 +31,21 @@ module Carto
         @redis_vizjson_cache = redis_vizjson_cache
       end
 
-      def to_vizjson(https_request: false, vector: false)
-        generate_vizjson(https_request: https_request, vector: vector, forced_privacy_version: nil)
+      def to_vizjson(https_request: false, vector: false, webgl: false)
+        generate_vizjson(https_request: https_request, vector: vector, forced_privacy_version: nil, webgl: webgl)
       end
 
-      def to_named_map_vizjson(https_request: false, vector: false)
-        generate_vizjson(https_request: https_request, vector: vector, forced_privacy_version: :force_named)
+      def to_named_map_vizjson(https_request: false, vector: false, webgl: false)
+        generate_vizjson(https_request: https_request, vector: vector, forced_privacy_version: :force_named, webgl: webgl)
       end
 
-      def to_anonymous_map_vizjson(https_request: false, vector: false)
-        generate_vizjson(https_request: https_request, vector: vector, forced_privacy_version: :force_anonymous)
+      def to_anonymous_map_vizjson(https_request: false, vector: false, webgl: false)
+        generate_vizjson(https_request: https_request, vector: vector, forced_privacy_version: :force_anonymous, webgl: webgl)
       end
 
       private
 
-      def generate_vizjson(https_request:, vector:, forced_privacy_version:)
+      def generate_vizjson(https_request:, vector:, forced_privacy_version:, webgl:)
         https_request ||= false
         vector ||= false
         version = case forced_privacy_version
@@ -66,6 +66,7 @@ module Carto
                   end
 
         vizjson[:vector] = vector
+        vizjson[:webgl] = webgl
 
         vizjson
       end
