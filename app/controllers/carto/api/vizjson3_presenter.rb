@@ -48,6 +48,7 @@ module Carto
       def generate_vizjson(https_request:, vector:, forced_privacy_version:, webgl:)
         https_request ||= false
         vector ||= false
+        webgl ||= false
         version = case forced_privacy_version
                   when :force_named
                     '3n'
