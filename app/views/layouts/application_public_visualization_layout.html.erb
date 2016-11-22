@@ -38,9 +38,6 @@
     <![endif]-->
   </head>
   <body class="<%= yield :body_class %>">
-    <% if params[:webgl] %>
-      <script src="https://mapzen.com/tangram/tangram.min.js"></script>
-    <% end %>
     <%= yield :content %>
     <%= yield :js %>
   </body>
