@@ -74,6 +74,8 @@ module Carto
              dependent: :destroy,
              order: :created_at
 
+    has_many :layer_node_styles
+
     TEMPLATES_MAP = {
       'table/views/infowindow_light' =>               'infowindow_light',
       'table/views/infowindow_dark' =>                'infowindow_dark',
@@ -179,7 +181,7 @@ module Carto
     end
 
     def visualization
-      map.visualization
+      map.visualization if map
     end
 
     def user
@@ -250,7 +252,7 @@ module Carto
     def affected_table_names(query)
       return [] unless query.present?
 
-      query_tables = user.in_database.execute("SELECT unnest(CDB_QueryTables(#{user.in_database.quote(query)}))")
+      query_tables = user.in_database.execute("SELECT unnest(CDB_QueryTablesText(#{user.in_database.quote(query)}))")
       query_tables.column_values(0).uniq
     end
 

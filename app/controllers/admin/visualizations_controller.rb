@@ -56,6 +56,10 @@ class Admin::VisualizationsController < Admin::AdminController
     @first_time    = !current_user.dashboard_viewed?
     @just_logged_in = !!flash['logged']
     @google_maps_query_string = current_user.google_maps_query_string
+
+    carto_viewer = current_viewer && Carto::User.where(id: current_viewer.id).first
+    @dashboard_notifications = carto_viewer ? carto_viewer.notifications_for_category(:dashboard) : {}
+
     current_user.view_dashboard
 
     respond_to do |format|
@@ -78,7 +82,7 @@ class Admin::VisualizationsController < Admin::AdminController
     @basemaps = @visualization.user.basemaps
 
     if table_action
-      if current_user.force_builder? && @visualization.has_read_permission?(current_user)
+      if current_user.builder_enabled? && @visualization.has_read_permission?(current_user)
         return redirect_to CartoDB.url(self, 'builder_dataset', { id: request.params[:id] }, current_user)
       elsif !@visualization.has_write_permission?(current_user)
         return redirect_to CartoDB.url(self, 'public_table_map', id: request.params[:id], redirected: true)
@@ -86,7 +90,7 @@ class Admin::VisualizationsController < Admin::AdminController
     elsif !@visualization.has_write_permission?(current_user)
       return redirect_to CartoDB.url(self, 'public_visualizations_public_map',
                                      id: request.params[:id], redirected: true)
-    elsif current_user.force_builder? && !@visualization.open_in_editor?
+    elsif current_user.builder_enabled? && !@visualization.open_in_editor?
       return redirect_to CartoDB.url(self, 'builder_visualization', { id: request.params[:id] }, current_user)
     end
 
@@ -367,7 +371,7 @@ class Admin::VisualizationsController < Admin::AdminController
       format.html { render 'public_map', layout: 'application_public_visualization_layout' }
     end
   rescue => e
-    Rollbar.report_exception(e)
+    CartoDB::Logger.error(exception: e)
     public_map_protected
   end
 
@@ -389,7 +393,7 @@ class Admin::VisualizationsController < Admin::AdminController
       format.html { render 'embed_map', layout: 'application_public_visualization_layout' }
     end
   rescue => e
-    Rollbar.report_exception(e)
+    CartoDB::Logger.error(exception: e)
     embed_protected
   end
 
@@ -674,7 +678,7 @@ class Admin::VisualizationsController < Admin::AdminController
       format.html { render layout: 'application_public_visualization_layout' }
     end
   rescue => e
-    Rollbar.report_exception(e)
+    CartoDB::Logger.error(exception: e)
     embed_forbidden
   end
 

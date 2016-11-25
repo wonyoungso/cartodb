@@ -172,6 +172,17 @@ describe Admin::VisualizationsController do
           last_response.status.should eq 200
         end
 
+        it 'never for maps with google basemaps' do
+          @user.stubs(:builder_enabled).returns(true)
+          @user.stubs(:builder_enabled?).returns(true)
+
+          Carto::Visualization.find(@id).layers.create(kind: 'gmapsbase')
+
+          login_as(@user, scope: @user.username)
+          get public_visualizations_show_path(id: @id), {}, @headers
+          last_response.status.should eq 200
+        end
+
         it 'embed redirects to builder for v3 when needed' do
           # These two tests are in the same testcase to test proper embed cache invalidation
           @user.stubs(:builder_enabled).returns(false)
@@ -486,9 +497,10 @@ describe Admin::VisualizationsController do
       # --------TEST ITSELF-----------
 
       org = Organization.new
-      org.name = 'vis-spec-org'
+      org.name = 'vis-spec-org-2'
       org.quota_in_bytes = 1024 ** 3
       org.seats = 10
+      org.builder_enabled = false
       org.save
 
       ::User.any_instance.stubs(:remaining_quota).returns(1000)
@@ -587,6 +599,7 @@ describe Admin::VisualizationsController do
       org.name = 'vis-spec-org'
       org.quota_in_bytes = 1024**3
       org.seats = 10
+      org.builder_enabled = false
       org.save
 
       ::User.any_instance.stubs(:remaining_quota).returns(1000)

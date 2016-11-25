@@ -51,19 +51,16 @@
   margin-top: 1px;
 }
 
-.Editor-ListLayer-item.has-error {
-  &::after {
-    display: block;
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 8px;
-    height: 8px;
-    border: 2px solid $cWhite;
-    border-radius: 50px;
-    background-color: $cError;
-    content: ' ';
-  }
+.Editor-ListLayer-itemError {
+  display: block;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid $cWhite;
+  border-radius: 50px;
+  background-color: $cError;
 }
 
 .Editor-ListLayer-item--placeholder {
@@ -149,8 +146,11 @@
   margin-top: 16px;
 }
 .Editor-ListAnalysis:empty,
-.Editor-ListAnalysis.is-hidden {
+.Editor-ListAnalysis.is-collapsed {
   display: none;
+}
+.Editor-ListAnalysis.is-hidden {
+  opacity: 0.24;
 }
 
 .Editor-ListAnalysis::before {
