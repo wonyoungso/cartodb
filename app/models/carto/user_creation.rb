@@ -1,12 +1,19 @@
 # encoding: UTF-8
+require_dependency 'carto/user_authenticator'
 
 class Carto::UserCreation < ActiveRecord::Base
-  CREATED_VIA_LDAP = 'ldap'
-  CREATED_VIA_ORG_SIGNUP = 'org_signup'
-  CREATED_VIA_API = 'api'
-  CREATED_VIA_HTTP_AUTENTICATION = 'http_authentication'
+  include Carto::UserAuthenticator
 
-  VALID_CREATED_VIA = [CREATED_VIA_LDAP, CREATED_VIA_ORG_SIGNUP, CREATED_VIA_API, CREATED_VIA_HTTP_AUTENTICATION]
+  CREATED_VIA_SAML = 'saml'.freeze
+  CREATED_VIA_LDAP = 'ldap'.freeze
+  CREATED_VIA_ORG_SIGNUP = 'org_signup'.freeze
+  CREATED_VIA_API = 'api'.freeze
+  CREATED_VIA_HTTP_AUTENTICATION = 'http_authentication'.freeze
+
+  VALID_CREATED_VIA = [
+    CREATED_VIA_LDAP, CREATED_VIA_SAML, CREATED_VIA_ORG_SIGNUP,
+    CREATED_VIA_API, CREATED_VIA_HTTP_AUTENTICATION
+  ].freeze
 
   IN_PROGRESS_STATES = [:initial, :enqueuing, :creating_user, :validating_user, :saving_user, :promoting_user, :load_common_data, :creating_user_in_central]
   FINAL_STATES = [:success, :failure]
@@ -109,7 +116,8 @@ class Carto::UserCreation < ActiveRecord::Base
       !has_valid_invitation? &&
       !Carto::Ldap::Manager.new.configuration_present? &&
       !created_via_api? &&
-      !created_via_http_authentication?
+      !created_via_http_authentication? &&
+      !created_via_saml?
   end
 
   def autologin?
@@ -131,6 +139,10 @@ class Carto::UserCreation < ActiveRecord::Base
 
   def created_via_http_authentication?
     created_via == CREATED_VIA_HTTP_AUTENTICATION
+  end
+
+  def created_via_saml?
+    created_via == CREATED_VIA_SAML
   end
 
   def has_valid_invitation?
@@ -197,7 +209,7 @@ class Carto::UserCreation < ActiveRecord::Base
     @cartodb_user.google_sign_in = google_sign_in
     @cartodb_user.github_user_id = github_user_id
     @cartodb_user.invitation_token = invitation_token
-    @cartodb_user.enable_account_token = ::User.make_token if requires_validation_email?
+    @cartodb_user.enable_account_token = make_token if requires_validation_email?
 
     unless organization_id.nil? || @promote_to_organization_owner
       organization = ::Organization.where(id: organization_id).first

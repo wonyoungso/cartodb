@@ -67,11 +67,19 @@ module ApplicationHelper
       end
   end
 
+  def app_assets_base_url
+    asset_host = CartoDB.get_absolute_url(Cartodb.get_config(:app_assets, 'asset_host'))
+    base_url = asset_host.present? ? asset_host : CartoDB.base_domain_from_request(request)
+    "#{base_url}/assets"
+  end
+
   module_function :maps_api_template
   module_function :sql_api_template, :sql_api_url
+  module_function :app_assets_base_url
 
   def frontend_config
     config = {
+      app_assets_base_url:        app_assets_base_url,
       maps_api_template:          maps_api_template,
       sql_api_template:           sql_api_template,
       user_name:                  CartoDB.extract_subdomain(request),
@@ -206,6 +214,12 @@ module ApplicationHelper
       token = CartoDB::Hubspot::instance.token
 
       render(:partial => 'shared/hubspot_form', :locals => { token: token, form_id: CartoDB::Hubspot::instance.form_ids[form] })
+    end
+  end
+
+  def insert_fullstory
+    if Cartodb.get_config(:fullstory, 'org').present? && current_user && current_user.account_type.casecmp('FREE').zero?
+      render(partial: 'shared/fullstory', locals: { org: Cartodb.get_config(:fullstory, 'org') })
     end
   end
 

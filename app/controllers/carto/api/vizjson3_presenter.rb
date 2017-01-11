@@ -324,7 +324,7 @@ module Carto
       def to_vizjson
         vizjson = { id: @layer.id }
 
-        if @layer.base?
+        if @layer.base_layer?
           vizjson.merge(as_base)
         else
           vizjson.merge(as_data).merge(@layer.torque? ? as_torque : as_carto)

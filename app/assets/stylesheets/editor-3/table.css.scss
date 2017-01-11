@@ -4,6 +4,7 @@
 @import 'cdb-utilities/mixins';
 @import 'cdb-variables/colors';
 @import 'cdb-variables/sizes';
+@import 'vars';
 
 $elementWidth: 180px;
 $elementWidthShort: 120px;
@@ -302,3 +303,18 @@ $tableBorderColor: $cSecondaryLine;
 .Table-editorDate input[name="time"] {
   width: 68px;
 }
+
+@media (max-width: $reponsiveWidth) {
+  .Table {
+    top: $baseSize;
+    right: $baseSize;
+    bottom: $baseSize;
+    left: $baseSize;
+  }
+  .Table-paginator {
+    bottom: 17px;
+  }
+}
+
+
+

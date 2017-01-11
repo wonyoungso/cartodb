@@ -1,4 +1,4 @@
-# encoding utf-8
+# encoding: utf-8
 
 require 'factories/carto_visualizations'
 require 'spec_helper_min'
@@ -1233,6 +1233,34 @@ module Carto
                                  .instance_eval { @format }
 
             check_hash_has_keys(format.to_segment, current_prod_properties)
+          end
+        end
+
+        describe CreatedWidget do
+          before(:all) do
+            @widget = FactoryGirl.create(:widget, layer: @visualization.data_layers.first)
+          end
+
+          after(:all) do
+            @widget.destroy
+          end
+
+          it 'should validate the widget exists' do
+            event = Carto::Tracking::Events::CreatedWidget.new(@user.id,
+                                                               user_id: @user.id,
+                                                               visualization_id: @visualization.id,
+                                                               widget_id: random_uuid)
+
+            expect { event.report! }.to raise_error(Carto::LoadError)
+          end
+
+          it 'should report when valid widget' do
+            event = Carto::Tracking::Events::CreatedWidget.new(@user.id,
+                                                               user_id: @user.id,
+                                                               visualization_id: @visualization.id,
+                                                               widget_id: @widget.id)
+
+            expect { event.report! }.to_not raise_error
           end
         end
 

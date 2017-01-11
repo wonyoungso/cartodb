@@ -83,7 +83,7 @@ class Map < Sequel::Model
   def notify_map_change
     visualization = visualizations.first
 
-    force_notify_map_change unless visualization && visualization.latest_mapcap
+    force_notify_map_change
   end
 
   def force_notify_map_change
@@ -93,6 +93,7 @@ class Map < Sequel::Model
 
   def before_destroy
     raise CartoDB::InvalidMember.new(user: "Viewer users can't destroy maps") if user && user.viewer
+    layers.each(&:destroy)
     super
     invalidate_vizjson_varnish_cache
   end

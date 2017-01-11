@@ -17,7 +17,7 @@ describe Api::Json::VisualizationsController do
   include MetricsHelper
 
   before(:all) do
-    @user = create_user(username: 'test')
+    @user = create_user
   end
 
   after(:all) do
@@ -42,7 +42,7 @@ describe Api::Json::VisualizationsController do
   describe '#create' do
     describe '#duplicate map' do
       before(:all) do
-        @other_user = create_user(username: 'other-user')
+        @other_user = create_user
       end
 
       before(:each) do
@@ -266,7 +266,7 @@ describe Api::Json::VisualizationsController do
         end
       end
 
-      it 'sets LINK privacy if the user has private_maps' do
+      it 'sets table privacy if the user has private_maps' do
         table1 = create_table(user_id: @org_user_1.id)
         payload = {
           tables: [table1.name]
@@ -276,7 +276,7 @@ describe Api::Json::VisualizationsController do
           response.status.should eq 200
           vid = response.body[:id]
           v = CartoDB::Visualization::Member.new(id: vid).fetch
-          v.privacy.should eq CartoDB::Visualization::Member::PRIVACY_LINK
+          v.privacy.should eq CartoDB::Visualization::Member::PRIVACY_PRIVATE
         end
       end
 

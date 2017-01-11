@@ -7,17 +7,9 @@ describe Carto::Visualization do
   include UniqueNamesHelper
 
   before(:all) do
-    @user = create_user(
-      email: 'admin@cartotest.com',
-      username: 'admin',
-      password: '123456'
-    )
+    @user = create_user
     @carto_user = Carto::User.find(@user.id)
-    @user2 = create_user(
-      email: 'noadmin@cartotest.com',
-      username: 'noadmin',
-      password: '123456'
-    )
+    @user2 = create_user
     @carto_user2 = Carto::User.find(@user2.id)
   end
 
@@ -160,6 +152,27 @@ describe Carto::Visualization do
       @visualization.version = 3
       @visualization.stubs(:mapcapped?).returns(true)
       @visualization.published?.should eq true
+    end
+  end
+
+  describe '#can_be_private?' do
+    before(:all) do
+      @visualization = FactoryGirl.create(:carto_visualization, user: @carto_user)
+      @visualization.reload # to clean up the user relation (see #11134)
+    end
+
+    after(:all) do
+      @visualization.destroy
+    end
+
+    it 'returns private_tables_enabled for tables' do
+      @visualization.type = 'table'
+      @visualization.can_be_private?.should eq @user.private_tables_enabled
+    end
+
+    it 'returns private_maps_enabled for maps' do
+      @visualization.type = 'derived'
+      @visualization.can_be_private?.should eq @user.private_maps_enabled
     end
   end
 end

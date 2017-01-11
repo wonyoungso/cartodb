@@ -366,7 +366,7 @@ describe Admin::VisualizationsController do
 
       get "/viz/#{name}/embed_map", {}, @headers
       last_response.status.should == 403
-      last_response.body.should =~ /cartodb-embed-error/
+      last_response.body.should include("Looks like this map is set as private or no longer exists")
     end
 
     it 'renders embed map error when an exception is raised' do
@@ -374,7 +374,6 @@ describe Admin::VisualizationsController do
 
       get "/viz/220d2f46-b371-11e4-93f7-080027880ca6/embed_map", {}, @headers
       last_response.status.should == 404
-      last_response.body.should =~ /404/
     end
 
     it 'doesnt serve X-Frame-Options: DENY on embedded with name' do
@@ -603,13 +602,13 @@ describe Admin::VisualizationsController do
       org.save
 
       ::User.any_instance.stubs(:remaining_quota).returns(1000)
-      user_a = create_user(username: 'org-user-a', quota_in_bytes: 123456789, table_quota: 400)
+      user_a = create_user(quota_in_bytes: 123456789, table_quota: 400)
       user_org = CartoDB::UserOrganization.new(org.id, user_a.id)
       user_org.promote_user_to_admin
       org.reload
       user_a.reload
 
-      user_b = create_user(username: 'user-b-non-org', quota_in_bytes: 123456789, table_quota: 400)
+      user_b = create_user(quota_in_bytes: 123456789, table_quota: 400)
 
       vis_id = factory(user_a).fetch('id')
       vis = CartoDB::Visualization::Member.new(id: vis_id).fetch

@@ -351,6 +351,33 @@ describe Map do
     end
   end
 
+  describe '#notify_map_change' do
+    before(:each) do
+      @map = Map.create(user_id: @user.id, table_id: @table.id)
+      layer = Layer.new(kind: 'tiled')
+      @map.add_layer(layer)
+    end
+
+    after(:each) do
+      @map.destroy
+    end
+
+    it 'invalidates vizjson cache' do
+      CartoDB::Varnish.any_instance.stubs(:purge).with(@map.visualization.varnish_vizjson_key).once
+      @map.notify_map_change
+      CartoDB::Varnish.any_instance.stubs(:purge) # Needed to avoid counting the call from destroy
+    end
+
+    it 'updates_named_maps' do
+      named_maps_api_mock = mock
+      Carto::NamedMaps::Api.stubs(:new).with { |vis| vis.id == @map.visualization.id }.returns(named_maps_api_mock)
+      named_maps_api_mock.stubs(:show).returns(true)
+      named_maps_api_mock.stubs(:update).once
+      @map.notify_map_change
+      Carto::NamedMaps::Api.unstub(:new)
+    end
+  end
+
   describe '#updated_at' do
     it 'is updated after saving the map' do
       map         = Map.create(user_id: @user.id, table_id: @table.id)
@@ -376,13 +403,13 @@ describe Map do
       map.add_layer(Layer.new(kind: 'carto', order: 5))
       map.save.reload
 
-      second__tiled_layer = Layer.new(kind: 'tiled')
+      second_tiled_layer = Layer.new(kind: 'tiled')
       # more tiled layers allowed only if at top
-      second__tiled_layer.order = 0
-      map.admits_layer?(second__tiled_layer).should == false
-      second__tiled_layer.order = 15
-      map.admits_layer?(second__tiled_layer).should == true
-      map.add_layer(layer)
+      second_tiled_layer.order = 0
+      map.admits_layer?(second_tiled_layer).should == false
+      second_tiled_layer.order = 15
+      map.admits_layer?(second_tiled_layer).should == true
+      map.add_layer(second_tiled_layer)
       map.save.reload
 
       # This is now a valid scenario, for example switcing from a basemap with labels on top to another that has too

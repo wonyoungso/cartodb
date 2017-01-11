@@ -29,6 +29,17 @@
   height: 100%;
 }
 
+.Editor-fillImage {
+  display: flex;
+  height: 16px;
+  padding: 0 0 0 2px;
+}
+
+.Editor-fillImageAsset {
+  width: auto;
+  height: 16px;
+}
+
 .CDB-OptionInput-item.is-disabled .CDB-OptionInput-content {
   color: #CCC;
 }

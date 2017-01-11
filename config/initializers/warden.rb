@@ -1,3 +1,5 @@
+require_dependency 'carto/user_authenticator'
+
 Rails.configuration.middleware.use RailsWarden::Manager do |manager|
   manager.default_strategies :password, :api_authentication
   manager.failure_app = SessionsController
@@ -15,13 +17,15 @@ class Warden::SessionSerializer
 end
 
 Warden::Strategies.add(:password) do
+  include Carto::UserAuthenticator
+
   def valid_password_strategy_for_user(user)
     user.organization.nil? || user.organization.auth_username_password_enabled
   end
 
   def authenticate!
     if params[:email] && params[:password]
-      if (user = ::User.authenticate(params[:email], params[:password]))
+      if (user = authenticate(params[:email], params[:password]))
         if user.enabled? && valid_password_strategy_for_user(user)
           success!(user, :message => "Success")
           request.flash['logged'] = true
@@ -193,6 +197,46 @@ Warden::Strategies.add(:http_header_authentication) do
     success!(user)
   rescue => e
     CartoDB.report_exception(e, "Authenticating with http_header_authentication", user: user)
+    return fail!
+  end
+end
+
+Warden::Strategies.add(:saml) do
+  def organization_from_request
+    subdomain = CartoDB.extract_subdomain(request)
+    Carto::Organization.where(name: subdomain).first if subdomain
+  end
+
+  def saml_service(organization = organization_from_request)
+    Carto::SamlService.new(organization) if organization
+  end
+
+  def valid?
+    params[:SAMLResponse].present? && saml_service.try(:enabled?)
+  end
+
+  def authenticate!
+    organization = organization_from_request
+    saml_service = Carto::SamlService.new(organization)
+
+    email = saml_service.get_user_email(params[:SAMLResponse])
+    user = organization.users.where(email: email.strip.downcase).first
+
+    if user
+      if user.try(:enabled?)
+        success!(user, message: "Success")
+        request.flash['logged'] = true
+      else
+        fail!
+      end
+    else
+      throw(:warden,
+            action: 'saml_user_not_in_carto',
+            organization_id: organization.id,
+            saml_email: email)
+    end
+  rescue => e
+    CartoDB::Logger.error(message: "Authenticating with SAML", exception: e)
     return fail!
   end
 end
